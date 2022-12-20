@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     #apps
-    'machine',
     'common',
+    'machine',
+    'task',
 
     #third-party
     'django_cleanup.apps.CleanupConfig',

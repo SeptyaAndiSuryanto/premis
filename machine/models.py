@@ -13,8 +13,6 @@ import premis.validators as validators
 import premis.helpers as helpers
 
 
-
-
 # Create your models here.
 logger = logging.getLogger("premis")
 
