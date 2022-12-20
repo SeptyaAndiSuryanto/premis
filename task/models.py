@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 import premis.validators as validators
+from machine.models import Machine
 
 # Create your models here.
 
@@ -90,3 +91,37 @@ class CheckItem(models.Model):
     def get_api_url():
         """Return the API URL associated with the Company model"""
         return reverse('api-check-item-list')
+
+
+class Task(models.Model):
+
+    machine = models.ForeignKey(Machine, verbose_name=_("Machine"), on_delete=models.DO_NOTHING)
+
+    item = models.ForeignKey(CheckItem, verbose_name=_("Item"), on_delete=models.DO_NOTHING)
+
+    description = models.CharField(
+        blank=True,
+        max_length=250,
+        verbose_name=_("Description"),
+        help_text=_("Description (optional)")
+    )
+
+    creation_date = models.DateField(auto_now_add=True, editable=False, blank=True, null=True, verbose_name=_('Creation Date'))
+
+    creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('Creation User'), related_name='task_created')
+
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['machine', 'item'], name='unique_machine_item_pair')
+        ]
+        verbose_name = _("Task")
+        verbose_name_plural = _("Tasks")
+
+    def __str__(self):
+        """Get string representation of a Period."""
+        return "{n} - {d}".format(n=self.machine, d=self.item)
+
+    def get_absolute_url(self):
+        """Get the web URL for the detail view for this task."""
+        return reverse('task-detail', kwargs={'pk': self.id})

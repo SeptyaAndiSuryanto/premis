@@ -49,5 +49,31 @@ class CheckItemAdmin(ImportExportModelAdmin):
         'description',
     ]
 
+
+class TaskResource(PremisResource):
+    
+    class Meta:
+        """Metaclass defines extra options"""
+        model = models.Task
+        skip_unchanged = True
+        report_skipped = False
+        clean_model_instances = True
+
+
+class TaskAdmin(ImportExportModelAdmin):
+    """Admin class for the Company model"""
+
+    resource_class = TaskResource
+
+    list_display = ('id','machine', 'item', 'description')
+
+    search_fields = [
+        'machine',
+        'item',
+        'description',
+    ]
+
+
 admin.site.register(models.Period, PeriodAdmin)
 admin.site.register(models.CheckItem, CheckItemAdmin)
+admin.site.register(models.Task, TaskAdmin)
