@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
 ]
 
 
@@ -59,7 +60,15 @@ INSTALLED_APPS = [
     'import_export',
     'mptt',
     'rest_framework',
+    'djangobower',
 ]
+
+
+BOWER_INSTALLED_APPS = (
+    'bootstrap',
+    'jquery',
+)
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -141,6 +150,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static") #folder static path
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, "components")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'index'
