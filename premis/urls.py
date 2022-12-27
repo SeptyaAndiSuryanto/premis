@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 
+from users.views import PremisLoginView
+
 
 urlpatterns = [
-    path("login/", TemplateView.as_view(template_name="login/login.html"), name="login"),
+    path("login/", PremisLoginView.as_view(), name="login"),
     path('admin/', admin.site.urls),
 ]

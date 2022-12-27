@@ -19,6 +19,7 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 
@@ -61,12 +62,14 @@ INSTALLED_APPS = [
     'mptt',
     'rest_framework',
     'djangobower',
+    'compressor',
+    'crispy_forms',
 ]
 
 
 BOWER_INSTALLED_APPS = (
-    'bootstrap',
-    'jquery',
+    # 'bootstrap',
+    # 'jquery',
 )
 
 
@@ -98,6 +101,10 @@ TEMPLATES = [
         },
     },
 ]
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
 
 WSGI_APPLICATION = 'premis.wsgi.application'
 

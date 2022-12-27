@@ -1,5 +1,8 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
+{% load crispy_forms_tags %}
+
 
 <!doctype html>
 <html lang="en">
@@ -10,61 +13,66 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS v5.2.1 -->
-  <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-<style>
-html,
-body {
-  height: 100%;
-}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.16/dist/sweetalert2.min.css" integrity="sha256-sWZjHQiY9fvheUAOoxrszw9Wphl3zqfVaz1kZKEvot8=" crossorigin="anonymous">
+  <!-- Bootstrap SCSS v5.2.1 -->
+  {% compress css %}
+    <link type="text/x-scss" href="{% static 'bootstrap/scss/bootstrap.scss' %}" rel="stylesheet" media="screen">
+  {% endcompress %}
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
 
-body {
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
-}
+    body {
+      display: flex;
+      align-items: center;
+      padding-top: 40px;
+      padding-bottom: 40px;
+      background-color: #f5f5f5;
+    }
 
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-}
+    .form-signin {
+      max-width: 330px;
+      padding: 15px;
+    }
 
-.form-signin .form-floating:focus-within {
-  z-index: 2;
-}
+    .form-signin .form-floating:focus-within {
+      z-index: 2;
+    }
 
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
+    .form-signin input[type="email"] {
+      margin-bottom: -1px;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+    }
 
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-    </style>
+    .form-signin input[type="password"] {
+      margin-bottom: 10px;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+      </style>
 </head>
 
 <body class="text-center">
   <header>
     <!-- place navbar here -->
   </header>
+  
   <main class="form-signin w-100 m-auto">
-    <form>
+    <form action="{% url 'login' %}" method="POST">
+      {% csrf_token %}
       <img class="mb-4" src="{% static 'image/hdi-logo.png' %}" alt="" width="200" height="40">
       <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-  
+      
       <div class="form-floating">
-        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-        <label for="floatingInput">Email address</label>
+        <input type="text" class="form-control" name="username" id="id_username" placeholder="Username">
+        <label for="id_username">Username</label>
       </div>
       <div class="form-floating">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-        <label for="floatingPassword">Password</label>
+        <input type="password" class="form-control" name="password" id="id_password" placeholder="Password">
+        <label for="id_password">Password</label>
       </div>
   
       <div class="checkbox mb-3">
@@ -72,6 +80,7 @@ body {
           <input type="checkbox" value="remember-me"> Remember me
         </label>
       </div>
+      
       <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
       {% comment %} <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p> {% endcomment %}
     </form>
@@ -83,7 +92,30 @@ body {
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
     integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous">
   </script>
-  <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.16/dist/sweetalert2.all.min.js" integrity="sha256-b+fVEXPbYTCRvyFMiFsP3TAaUr7X3fbvPaPg5JqwsDw=" crossorigin="anonymous"></script>
+  <script>
+    var Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+
+    {% if form.errors %}
+      Toast.fire({
+          icon: 'error',
+          title: '{{ message }}'
+        })
+    {% elif form.success %}
+      Toast.fire({
+          icon: 'success',
+          title: 'Sign-in success'
+        })
+    {% endif %}
+    
+  </script>
 </body>
 
 </html>

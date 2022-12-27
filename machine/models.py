@@ -125,4 +125,8 @@ class Machine(models.Model):
             },
             **kwargs
         )
+    
+    def __str__(self):
+        """Get string representation of a Period."""
+        return "{n} - {d}".format(n=self.category.name, d=self.name)
 
