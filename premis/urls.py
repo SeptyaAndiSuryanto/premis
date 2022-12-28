@@ -17,10 +17,12 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 
+from premis.views import IndexView
 from users.views import PremisLoginView
 
 
 urlpatterns = [
+    path('', IndexView.as_view(), name="index"),
     path("login/", PremisLoginView.as_view(), name="login"),
     path('admin/', admin.site.urls),
 ]
