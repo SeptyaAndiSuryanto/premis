@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+{% endblock  %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item active">Machine</li>
+{% endblock %}
+
+{% block body %}
+<div class="card card-default color-palette-box">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fa-solid fa-cubes-stacked"></i>&nbsp;</i>Machine Category</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+            </button>
+          </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body p-0">
+                    <table class="table table-sm">
+                        <tbody>
+                        <tr>
+                            <td width="10%"><i class="fa-solid fa-circle-info"></i></td>
+                            <td width="30%">Description</td>
+                            <td>
+                                {% if "/machine/" == request.path %}<cite title="Source Title">Top level machine category</cite>{% endif %}
+                                {% if category %}
+                                    {% if category.description %}
+                                        {{ category.description }}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="10%"><i class="fa-solid fa-network-wired"></td>
+                            <td width="30%">Category Path</td>
+                            <td>/</td>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body p-0">
+                    <table class="table table-sm">
+                        <tbody>
+                        <tr>
+                            <td width="10%"><i class="fa-solid fa-network-wired"></i></td>
+                            <td width="70%">Subcategories</td>
+                            <td>{{ children.count }}</td>
+                        </tr>
+                        <tr>
+                            <td width="10%"><i class="fa-brands fa-houzz"></td>
+                            <td width="70%">Machine (Including subcategories)</td>
+                            <td>{{ machine_count }}</td>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-default color-palette-box">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fa-solid fa-network-wired"></i>&nbsp;</i>Subcategories</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="">
+                    <div class="card-body p-0">
+                        <table id="subcategories-table" class="table table-bordered table-hover" style="width:100%">
+                            <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Description</th>
+                              <th>Path</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script language="javascript">
+        $(document).ready(function () {
+            $('#subcategories-table').dataTable({
+                serverSide: true,
+                search: {
+                    return: true,
+                },
+                sAjaxSource: "http://127.0.0.1:80/machine/data/",  // new url
+                                    columns: [
+                                        {name: "name", data: 0,
+                                            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                                                $(nTd).html("<a href='"+sData+"'>"+sData+"</a>");
+                                            }
+                                        },
+                                        {name: "description", data: 1},
+                                        {name: "pathstring", data: 2},
+                                    ],
+            });
+        });
+    </script>
+{% endblock %}

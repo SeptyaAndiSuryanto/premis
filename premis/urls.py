@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
 from django.views.generic import TemplateView
 
 from premis.views import IndexView
@@ -25,4 +26,5 @@ urlpatterns = [
     path('', IndexView.as_view(), name="index"),
     path("login/", PremisLoginView.as_view(), name="login"),
     path('admin/', admin.site.urls),
+    path('machine/', include('machine.urls')),
 ]
