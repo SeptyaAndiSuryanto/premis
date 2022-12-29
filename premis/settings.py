@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'djangobower',
     'compressor',
     'crispy_forms',
+    'django_serverside_datatable',
 ]
 
 
