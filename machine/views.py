@@ -7,7 +7,7 @@ from django_serverside_datatable.views import ServerSideDatatableView
 
 
 # Create your views here.
-class MachineIndex(ListView):
+class Category(ListView):
     template_name = "category.html"
     model = Machine
     context_object_name = "machine"

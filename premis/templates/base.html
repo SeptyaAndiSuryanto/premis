@@ -24,7 +24,8 @@
         <img src="{% static 'image/hdi-mn-logo.png' %}" alt="AdminLTE Logo" class="brand-image" style="opacity: .8">
         <span class="brand-text font-weight-light">PREMIS</span>
       </a>
-      {% include '_sidebar.html' %}
+      {% block sidebar %}{% include '_sidebar.html' %}{% endblock sidebar %}
+      
     </aside>
 
     <div class="content-wrapper">

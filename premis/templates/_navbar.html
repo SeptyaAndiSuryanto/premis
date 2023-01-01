@@ -10,7 +10,7 @@
 
     {% if perms.machine %}
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="{% url 'machine-index' %}" class="nav-link {% if "/machine/" in request.path %}active{% endif %}"><i class="fa-brands fa-houzz"></i>&nbsp;Machine</a>
+            <a href="{% url 'machine-category' %}" class="nav-link {% if "/machine/" in request.path %}active{% endif %}"><i class="fa-brands fa-houzz"></i>&nbsp;Machine</a>
         </li>
     {% endif %}
 
