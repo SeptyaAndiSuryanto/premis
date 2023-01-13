@@ -1,5 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
+
 
 from .models import MachineCategory, Machine
 
@@ -7,7 +9,9 @@ from django_serverside_datatable.views import ServerSideDatatableView
 
 
 # Create your views here.
-class Category(ListView):
+class Category(LoginRequiredMixin, ListView):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
     template_name = "category.html"
     model = Machine
     context_object_name = "machine"
