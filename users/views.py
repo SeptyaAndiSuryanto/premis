@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.views import LoginView
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.generic import View
 
@@ -34,3 +35,7 @@ class PremisLoginView(View):
         
         message = 'Login failed'
         return render(request, self.template_name, context={'form':form, 'message':message})
+
+
+class PremisLogout(LogoutView):
+    template_name = 'login/logout.html'
