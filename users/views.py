@@ -18,9 +18,12 @@ class PremisLoginView(View):
     form_class = AuthenticationForm
 
     def get(self, request):
-        form = self.form_class
-        message = ''
-        return render(request, self.template_name, context={ 'form':form, 'message':message})
+        if request.user.is_authenticated:
+            return redirect('index')
+        else:
+            form = self.form_class
+            message = ''
+            return render(request, self.template_name, context={ 'form':form, 'message':message})
     
     def post(self, request):
         form = self.form_class(request, data=request.POST)

@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
+
+
 
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
@@ -82,6 +85,22 @@
             <div class="col-12">
                 <div class="">
                     <div class="card-body p-0">
+                        <div class='panel panel-hidden' id='panel-subcategories'>
+                            <div class='panel-heading'>
+                                <h4>{% trans "Subcategories" %}</h4>
+                            </div>
+                            <div class='panel-content'>
+                                <div id='subcategory-button-toolbar'>
+                                    <div class='btn-group' role='group'>
+                                        {% include "filter_list.html" with id="category" %}
+                                    </div>
+                                </div>
+                        
+                                <table class='table table-striped table-condensed' id='subcategory-table' data-toolbar='#subcategory-button-toolbar'></table>
+                        
+                            </div>
+                        </div>
+                        {{ request.get_host }}
                         <table id="subcategories-table" class="table table-bordered table-hover" style="width:100%">
                             <thead>
                             <tr>
@@ -104,21 +123,33 @@
 {% block extra_javascript %}
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script language="javascript">
+        $('#subcategory-table'), {
+            params: {
+                {% if category %}
+                parent: {{ category.pk }},
+                {% else %}
+                parent: null,
+                {% endif %}
+            },
+            allowTreeView: true,
+        }
+        
+
         $(document).ready(function () {
             $('#subcategories-table').dataTable({
                 serverSide: true,
                 search: {
                     return: true,
                 },
-                sAjaxSource: "http://127.0.0.1:80/machine/data/",  // new url
+                sAjaxSource: "/machine/data/",  // new url
                                     columns: [
-                                        {name: "name", data: 0,
+                                        {name: "name", data: 1,
                                             "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                                                $(nTd).html("<a href='"+sData+"'>"+sData+"</a>");
+                                                $(nTd).html("<a href='"+oData[0]+"'>"+sData+"</a>");
                                             }
                                         },
-                                        {name: "description", data: 1},
-                                        {name: "pathstring", data: 2},
+                                        {name: "description", data: 2},
+                                        {name: "pathstring", data: 3},
                                     ],
             });
         });

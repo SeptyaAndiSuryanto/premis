@@ -41,45 +41,61 @@ class Category(LoginRequiredMixin, ListView):
 class CategoryDetail(DetailView):
     """Detail view for PartCategory."""
 
-    model = PartCategory
+    model = MachineCategory
     context_object_name = 'category'
-    queryset = PartCategory.objects.all().prefetch_related('children')
-    template_name = 'part/category.html'
+    queryset = MachineCategory.objects.all().prefetch_related('children')
+    template_name = 'category.html'
 
     def get_context_data(self, **kwargs):
         """Returns custom context data for the CategoryDetail view:
 
-        - part_count: Number of parts in this category
+        - machine_count: Number of parts in this category
         - starred_directly: True if this category is starred directly by the requesting user
         - starred: True if this category is starred by the requesting user
         """
         context = super().get_context_data(**kwargs).copy()
 
         try:
-            context['part_count'] = kwargs['object'].partcount()
+            context['machine_count'] = kwargs['object'].machine_count()
         except KeyError:
-            context['part_count'] = 0
+            context['machine_count'] = 0
 
         # Get current category
-        category = kwargs.get('object', None)
+        # category = kwargs.get('object', None)
 
-        if category:
+        # if category:
 
-            # Insert "starred" information
-            context['starred_directly'] = category.is_starred_by(
-                self.request.user,
-                include_parents=False,
-            )
+        #     # Insert "starred" information
+        #     context['starred_directly'] = category.is_starred_by(
+        #         self.request.user,
+        #         include_parents=False,
+        #     )
 
-            if context['starred_directly']:
-                # Save a database lookup - if 'starred_directly' is True, we know 'starred' is also
-                context['starred'] = True
-            else:
-                context['starred'] = category.is_starred_by(self.request.user)
+        #     if context['starred_directly']:
+        #         # Save a database lookup - if 'starred_directly' is True, we know 'starred' is also
+        #         context['starred'] = True
+        #     else:
+        #         context['starred'] = category.is_starred_by(self.request.user)
 
         return context
 
 
-class MachineCategoryData(ServerSideDatatableView):
+class MachineCategoryData(ServerSideDatatableView, DetailView):
     queryset = MachineCategory.objects.filter(parent=None)
-    columns = ['name', 'description', 'pathstring']
+    columns = ['id','name', 'description', 'pathstring']
+
+    def get_context_data(self, **kwargs):
+        """Returns custom context data for the CategoryDetail view:
+
+        - machine_count: Number of parts in this category
+        - starred_directly: True if this category is starred directly by the requesting user
+        - starred: True if this category is starred by the requesting user
+        """
+        context = super().get_context_data(**kwargs).copy()
+
+        try:
+            context['machine_count'] = kwargs['object'].machine_count()
+        except KeyError:
+            context['machine_count'] = 0
+        return context
+        

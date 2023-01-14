@@ -58,6 +58,32 @@ class MachineCategory(PremisTree):
     class Meta:
         verbose_name = _("Machine Category")
         verbose_name_plural = _("Machine Categories")
+    
+    def get_machine(self, cascade=True) -> models.QuerySet:
+        """Return a queryset for all Machine under this category.
+
+        Args:
+            cascade (bool, optional): If True, also look under subcategories. Defaults to True.
+
+        Returns:
+            set[Machine]: All matching Machine
+        """
+        if cascade:
+            """Select any Machine which exist in this category or any child categories."""
+            queryset = Machine.objects.filter(category__in=self.getUniqueChildren(include_self=True))
+        else:
+            queryset = Machine.objects.filter(category=self.pk)
+
+        return queryset
+
+    def machine_count(self, cascade=True, active=False):
+        """Return the total part count under this category (including children of child categories)."""
+        query = self.get_machine(cascade=cascade)
+
+        if active:
+            query = query.filter(active=True)
+
+        return query.count()
 
 
 class MachineManager(TreeManager):
