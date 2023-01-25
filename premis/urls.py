@@ -1,18 +1,28 @@
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LogoutView
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import include
-from django.views.generic import TemplateView
 
 from premis.views import IndexView
 from users.views import PremisLoginView, PremisLogout
+from machine.urls import machinepatterns as machine_urls
 
+
+authurls = [
+    re_path(r'^login/', PremisLoginView.as_view(), name="login"),
+    re_path(r'^logout/', PremisLogout.as_view(), name="logout"),
+]
+
+fronturls = [
+    path('', login_required(IndexView.as_view(), login_url='login'), name="index"),
+    re_path(r'^machine/', include(machine_urls)),
+]
+
+backurls = []
 
 urlpatterns = [
-    path('', login_required(IndexView.as_view(), login_url='login'), name="index"),
-    path("login/", PremisLoginView.as_view(), name="login"),
-    path("logout/", PremisLogout.as_view(), name="logout"),
+    re_path('', include(authurls)),
+    path('', include(fronturls)),
+    re_path('', include(backurls)),
     path('admin/', admin.site.urls),
-    path('machine/', include('machine.urls')),
 ]

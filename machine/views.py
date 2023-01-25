@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import TemplateView, ListView, DetailView
 
 
@@ -83,6 +84,11 @@ class CategoryDetail(DetailView):
 class MachineCategoryData(ServerSideDatatableView, DetailView):
     queryset = MachineCategory.objects.filter(parent=None)
     columns = ['id','name', 'description', 'pathstring']
+
+    def get_ajax_url(self):
+        if self.kwargs.get('pk'):
+            return reverse(self.request.resolver_match.url_name, kwargs={'pk':self.kwargs['pk']})
+        return reverse(self.request.resolver_match.url_name)
 
     def get_context_data(self, **kwargs):
         """Returns custom context data for the CategoryDetail view:

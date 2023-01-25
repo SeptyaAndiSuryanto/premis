@@ -13,12 +13,11 @@ category_urls = [
     ]))
 ]
 
-urlpatterns = [
+machinepatterns = [
     # re_path(r'^.*$', MachineIndex.as_view(), name='machine-index'),
-    path("category/", Category.as_view(), name="machine-category"),
-    path('data/', MachineCategoryData.as_view()), 
-    re_path(r'^category/', include(category_urls)),
-
-
+    re_path(r'^category/', Category.as_view(), name="machine-category"),
+    path('category/data/', MachineCategoryData.as_view(), name="machine-category-data"), 
+    path('category/data/<int:pk>/', MachineCategoryData.as_view(), name="machine-subcategory-data"), 
+    # re_path(r'^category/', include(category_urls)),
 ]
 
