@@ -81,21 +81,29 @@ class CategoryDetail(DetailView):
         return context
 
 
-class MachineCategoryData(ServerSideDatatableView, DetailView):
-    queryset = MachineCategory.objects.filter(parent=None)
+class MachineCategoryData(ServerSideDatatableView):
+    model = MachineCategory
+    # queryset = MachineCategory.objects.filter(parent=None)
     columns = ['id','name', 'description', 'pathstring']
+    
 
-    def get_ajax_url(self):
-        if self.kwargs.get('pk'):
-            return reverse(self.request.resolver_match.url_name, kwargs={'pk':self.kwargs['pk']})
-        return reverse(self.request.resolver_match.url_name)
+    # def get_ajax_url(self):
+    #     if self.kwargs.get('pk'):
+    #         return reverse(self.request.resolver_match.url_name, kwargs={'pk':self.kwargs['pk']})
+    #     return reverse(self.request.resolver_match.url_name)
+
+    def get_queryset(self):
+        queryset = MachineCategory.objects.filter(parent=None)
+        category = self.request.GET.get('category')
+        if category:
+            queryset = queryset.filter(category=category)
+            print(queryset)
+        return queryset
 
     def get_context_data(self, **kwargs):
-        """Returns custom context data for the CategoryDetail view:
+        """Returns custom context data for the MachineCategory view:
 
         - machine_count: Number of parts in this category
-        - starred_directly: True if this category is starred directly by the requesting user
-        - starred: True if this category is starred by the requesting user
         """
         context = super().get_context_data(**kwargs).copy()
 
@@ -104,4 +112,5 @@ class MachineCategoryData(ServerSideDatatableView, DetailView):
         except KeyError:
             context['machine_count'] = 0
         return context
-        
+
+
