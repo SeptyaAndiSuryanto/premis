@@ -101,6 +101,7 @@
                         
                             </div>
                         </div>
+                        {{ item }}
                         <table id="subcategories-table" class="table table-bordered table-hover" style="width:100%">
                             <thead>
                             <tr>
@@ -109,8 +110,6 @@
                               <th>Path</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
                           </table>
                         </div>
                 </div>
@@ -123,35 +122,38 @@
 {% block extra_javascript %}
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script language="javascript">
-        $('#subcategory-table'), {
-            params: {
-                {% if category %}
-                parent: {{ category.pk }},
-                {% else %}
-                parent: null,
-                {% endif %}
-            },
-            allowTreeView: true,
-        }
-        
+   
 
         $(document).ready(function () {
-            $('#subcategories-table').dataTable({
+            var table = $('#subcategories-table').DataTable({
+                processing: true,
                 serverSide: true,
+                ajax: "{% url 'machine-category-list' %}", 
+                columns: [
+                    {name: "name", data: "name"},
+                    {name: "description", data: "description"},
+                    {name: "pathstring", data: "pathstring"},
+                ],
                 search: {
                     return: true,
                 },
-                sAjaxSource: "{% url 'machine-category-data' %}",  // new url
-                                    columns: [
-                                        {name: "name", data: 1,
-                                            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                                                $(nTd).html("<a href='"+oData[0]+"'>"+sData+"</a>");
-                                            }
-                                        },
-                                        {name: "description", data: 2},
-                                        {name: "pathstring", data: 3},
-                                    ],
             });
+
+            $('#subcategories-table tbody').on('click', 'tr', function () {
+                var data = table.row( this ).data();
+                var id = data.id;
+            
+                $.ajax({
+                  "url": "{% url 'machine-category-list' %}?id=" + id,
+                  "success": function(result) {
+                    console.log(result.data);
+                    console.log(table);
+                    //table.clear();
+                    //table.rows.add(result.data);
+                    //table.draw();
+                  }
+                });
+              });
         });
     </script>
 {% endblock %}

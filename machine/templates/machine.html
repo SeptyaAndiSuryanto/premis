@@ -111,16 +111,13 @@
                 search: {
                     return: true,
                 },
-                sAjaxSource: "/machine/data/",  // new url
-                                    columns: [
-                                        {name: "name", data: 0,
-                                            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                                                $(nTd).html("<a href='"+sData+"'>"+sData+"</a>");
-                                            }
-                                        },
-                                        {name: "description", data: 1},
-                                        {name: "pathstring", data: 2},
-                                    ],
+                ajax: {
+                    url: '{% url "dynamic_mptt_datatable_view" %}',
+                    type: 'GET',
+                    data: function(d) {
+                      d.parent_id = $('#parent-id').val();
+                    }
+                  },
             });
         });
     </script>

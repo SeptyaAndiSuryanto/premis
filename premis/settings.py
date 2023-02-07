@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'import_export',
     'mptt',
     'rest_framework',
+    'django_filters',
     'djangobower',
     'compressor',
     'crispy_forms',

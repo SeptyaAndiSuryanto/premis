@@ -2,14 +2,53 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import TemplateView, ListView, DetailView
-
+from django_filters import rest_framework as filters
+from rest_framework import generics
+from rest_framework.response import Response
 
 from .models import MachineCategory, Machine
+from .serializers import MachineCategorySerializer
 
 from django_serverside_datatable.views import ServerSideDatatableView
 
 
+
 # Create your views here.
+class MachineCategoryFilter(filters.FilterSet):
+    class Meta:
+        model = MachineCategory
+        fields = '__all__'
+
+
+class MachineCategoryList(generics.ListAPIView):
+    queryset = MachineCategory.objects.all()
+    serializer_class = MachineCategorySerializer
+    filter_class = MachineCategoryFilter
+
+    def get(self, request, format=None):
+        if 'id' in request.GET:
+            id = request.GET['id']
+            queryset = self.queryset.filter(parent__id=id)
+        else:
+            queryset = self.queryset.filter(parent__isnull=True)
+
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({
+            'draw': 1,
+            'recordsTotal': self.queryset.count(),
+            'recordsFiltered': queryset.count(),
+            'data': serializer.data,
+        })
+    # def list(self, request, *args, **kwargs):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     serializer = self.serializer_class(queryset, many=True)
+    #     return Response({
+    #         "draw": 1,
+    #         "recordsTotal": self.queryset.count(),
+    #         "recordsFiltered": queryset.count(),
+    #         "data": serializer.data
+    #     })
+
 class Category(LoginRequiredMixin, ListView):
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
@@ -83,34 +122,23 @@ class CategoryDetail(DetailView):
 
 class MachineCategoryData(ServerSideDatatableView):
     model = MachineCategory
-    # queryset = MachineCategory.objects.filter(parent=None)
     columns = ['id','name', 'description', 'pathstring']
+
+    # queryset = MachineCategory.objects.filter(parent=None)
     
-
-    # def get_ajax_url(self):
-    #     if self.kwargs.get('pk'):
-    #         return reverse(self.request.resolver_match.url_name, kwargs={'pk':self.kwargs['pk']})
-    #     return reverse(self.request.resolver_match.url_name)
-
-    def get_queryset(self):
+    def get_queryset(self, **kwargs):
+        print(self.request.GET)
+        parent_id = self.request.GET.get('pk')
         queryset = MachineCategory.objects.filter(parent=None)
-        category = self.request.GET.get('category')
-        if category:
-            queryset = queryset.filter(category=category)
-            print(queryset)
+        if parent_id:
+            queryset = queryset.filter(parent__id=parent_id)
+        print(queryset)
         return queryset
 
-    def get_context_data(self, **kwargs):
-        """Returns custom context data for the MachineCategory view:
-
-        - machine_count: Number of parts in this category
-        """
-        context = super().get_context_data(**kwargs).copy()
-
-        try:
-            context['machine_count'] = kwargs['object'].machine_count()
-        except KeyError:
-            context['machine_count'] = 0
-        return context
+    # def get_datatable_options(self):
+    #     options = super().get_datatable_options()
+    #     options['start'] = int(self.request.GET.get('start', 0))
+    #     options['length'] = int(self.request.GET.get('length', 10))
+    #     return options
 
 
