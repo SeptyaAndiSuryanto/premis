@@ -122,8 +122,6 @@
 {% block extra_javascript %}
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script language="javascript">
-   
-
         $(document).ready(function () {
             var table = $('#subcategories-table').DataTable({
                 processing: true,
@@ -138,16 +136,37 @@
                     return: true,
                 },
             });
+            //console.log(table);
+            table.destroy();
 
             $('#subcategories-table tbody').on('click', 'tr', function () {
                 var data = table.row( this ).data();
+                console.log('1');
+                console.log(data);
+
                 var id = data.id;
+                console.log('2');
+                console.log(data);
             
                 $.ajax({
                   "url": "{% url 'machine-category-list' %}?id=" + id,
                   "success": function(result) {
-                    console.log(result.data);
-                    console.log(table);
+                    var table = $('#subcategories-table').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: "{% url 'machine-category-list' %}?id=" + id, 
+                        columns: [
+                            {name: "name", data: "name"},
+                            {name: "description", data: "description"},
+                            {name: "pathstring", data: "pathstring"},
+                        ],
+                        search: {
+                            return: true,
+                        },
+                    });
+
+                    //console.log(result.data);
+                    //console.log(table);
                     //table.clear();
                     //table.rows.add(result.data);
                     //table.draw();
