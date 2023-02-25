@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load mptt_tags %}
+
 
 
 
@@ -95,14 +97,10 @@
                                     <div class='btn-group' role='group'>
                                         {% include "filter_list.html" with id="category" %}
                                     </div>
-                                </div> {% endcomment %}
-                        
-                                <table class='table table-striped table-condensed' id='subcategory-table' data-toolbar='#subcategory-button-toolbar'></table>
-                        
+                                </div> {% endcomment %}                        
                             </div>
                         </div>
-                        {{ item }}
-                        <table id="subcategories-table" class="table table-bordered table-hover" style="width:100%">
+                        <table id="subcategories-table" class="table table-sm table-bordered table-hover" style="width:100%">
                             <thead>
                             <tr>
                               <th>Name</th>
@@ -110,7 +108,9 @@
                               <th>Path</th>
                             </tr>
                             </thead>
-                          </table>
+                            <tbody>
+                            </tbody>
+                            </table>
                         </div>
                 </div>
             </div>
@@ -120,59 +120,26 @@
 {% endblock %}
 
 {% block extra_javascript %}
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script language="javascript">
-        $(document).ready(function () {
-            var table = $('#subcategories-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{% url 'machine-category-list' %}", 
-                columns: [
-                    {name: "name", data: "name"},
-                    {name: "description", data: "description"},
-                    {name: "pathstring", data: "pathstring"},
-                ],
-                search: {
-                    return: true,
-                },
-            });
-            //console.log(table);
-            table.destroy();
-
-            $('#subcategories-table tbody').on('click', 'tr', function () {
-                var data = table.row( this ).data();
-                console.log('1');
-                console.log(data);
-
-                var id = data.id;
-                console.log('2');
-                console.log(data);
-            
-                $.ajax({
-                  "url": "{% url 'machine-category-list' %}?id=" + id,
-                  "success": function(result) {
-                    var table = $('#subcategories-table').DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ajax: "{% url 'machine-category-list' %}?id=" + id, 
-                        columns: [
-                            {name: "name", data: "name"},
-                            {name: "description", data: "description"},
-                            {name: "pathstring", data: "pathstring"},
-                        ],
-                        search: {
-                            return: true,
-                        },
-                    });
-
-                    //console.log(result.data);
-                    //console.log(table);
-                    //table.clear();
-                    //table.rows.add(result.data);
-                    //table.draw();
-                  }
-                });
+<script language="javascript">
+    function populateTable() {
+        $.ajax({
+            url: '{% url 'machine-category-list' %}',
+            dataType: 'json',
+            success: function(data) {
+              $.each(data.data, function(index, item) {
+                    var row = '<tr>' +
+                            '<td><a href="{% url 'machine-category' %}">' + item.name + '</a></td>' +
+                            '<td>' + item.description + '</td>' +
+                            '<td>' + item.pathstring + '</td>' +
+                          '</tr>';
+                  $('#subcategories-table tbody').append(row);
               });
-        });
-    </script>
+            }
+          });
+    }
+
+    $(document).ready(function() {
+        populateTable();    
+    });
+</script>
 {% endblock %}

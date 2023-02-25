@@ -49,15 +49,15 @@ class MachineCategoryList(generics.ListAPIView):
     #         "data": serializer.data
     #     })
 
-class Category(LoginRequiredMixin, ListView):
+class Category(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
     redirect_field_name = 'redirect_to'
     template_name = "category.html"
-    model = Machine
-    context_object_name = "machine"
+    # model = MachineCategory
+    # context_object_name = "machine_category"
 
     def get_queryset(self):
-        return Machine.objects.all().select_related('category')
+        return MachineCategory.objects.all()
     
     def get_context_data(self, **kwargs):
         """Returns custom context data for the PartIndex view:
