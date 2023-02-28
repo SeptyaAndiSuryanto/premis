@@ -54,27 +54,34 @@ class Category(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'redirect_to'
     template_name = "category.html"
     # model = MachineCategory
-    # context_object_name = "machine_category"
+    # context_object_name = "machine_categ ory"
 
-    def get_queryset(self):
-        return MachineCategory.objects.all()
+    # def get_queryset(self):
+    #     return MachineCategory.objects.all()
     
     def get_context_data(self, **kwargs):
         """Returns custom context data for the PartIndex view:
 
         - children: Number of child categories
         - category_count: Number of child categories
-        - part_count: Number of parts contained
+        - machine_count: Number of machine contained
         """
         context = super().get_context_data(**kwargs).copy()
 
-        # View top-level categories
-        children = MachineCategory.objects.filter(parent=None)
+        if 'id' in self.request.GET:
+            id = self.request.GET['id']
+            print(id)
+            children = MachineCategory.objects.get(id=id)
+            context['children'] = children
+            context['category_count'] = MachineCategory.objects.count()
+            context['machine_count'] = Machine.objects.filter(category=id).count()
 
-        context['children'] = children
-        context['category_count'] = MachineCategory.objects.count()
-        context['machine_count'] = Machine.objects.count()
-
+        else:
+            # View top-level categories
+            children = MachineCategory.objects.filter(parent=None)
+            context['children'] = children
+            context['category_count'] = MachineCategory.objects.count()
+            context['machine_count'] = Machine.objects.count()
         return context
 
 
@@ -129,9 +136,10 @@ class MachineCategoryData(ServerSideDatatableView):
     def get_queryset(self, **kwargs):
         print(self.request.GET)
         parent_id = self.request.GET.get('pk')
-        queryset = MachineCategory.objects.filter(parent=None)
         if parent_id:
             queryset = queryset.filter(parent__id=parent_id)
+        else:
+            queryset = MachineCategory.objects.filter(parent=None)
         print(queryset)
         return queryset
 

@@ -38,18 +38,17 @@
                             <td width="10%"><i class="fa-solid fa-circle-info"></i></td>
                             <td width="30%">Description</td>
                             <td>
-                                {% if "/machine/category/" == request.path %}<cite title="Source Title">Top level machine category</cite>{% endif %}
-                                {% if category %}
-                                    {% if category.description %}
-                                        {{ category.description }}
-                                    {% endif %}
+                                {% if children.description is None %}
+                                    <cite title="Source Title">Top level machine category</cite>
+                                {% else %}
+                                    <cite>{{ children.description }}</cite>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td width="10%"><i class="fa-solid fa-network-wired"></td>
                             <td width="30%">Category Path</td>
-                            <td>/</td>
+                            <td>{{ children.name|title }}</td>
                         </tbody>
                     </table>
                     </div>
@@ -126,20 +125,44 @@
             url: '{% url 'machine-category-list' %}',
             dataType: 'json',
             success: function(data) {
-              $.each(data.data, function(index, item) {
+                $.each(data.data, function(index, item) {
                     var row = '<tr>' +
-                            '<td><a href="{% url 'machine-category' %}">' + item.name + '</a></td>' +
-                            '<td>' + item.description + '</td>' +
-                            '<td>' + item.pathstring + '</td>' +
-                          '</tr>';
-                  $('#subcategories-table tbody').append(row);
-              });
+                        '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
+                        '<td>' + item.description + '</td>' +
+                        '<td>' + item.pathstring + '</td>' +
+                        '</tr>';
+                    $('#subcategories-table tbody').append(row);
+                });
+            }
+          });
+    }
+
+    function populateTableWithParam(id) {
+        $.ajax({
+            url: '{% url 'machine-category-list' %}' + '?id=' + id,
+            dataType: 'json',
+            success: function(data) {
+                $.each(data.data, function(index, item) {
+                    var row = '<tr>' +
+                        '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
+                        '<td>' + item.description + '</td>' +
+                        '<td>' + item.pathstring + '</td>' +
+                        '</tr>';
+                    $('#subcategories-table tbody').append(row);
+                });
             }
           });
     }
 
     $(document).ready(function() {
-        populateTable();    
+        var url = new URL(window.location.href);
+        var param = url.searchParams.get("id");
+        if (param!=null){
+            populateTableWithParam(param);
+        }
+        else{
+            populateTable();
+        }
     });
 </script>
 {% endblock %}

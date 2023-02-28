@@ -10,11 +10,12 @@ category_urls = [
     #     # re_path(r'^delete/', views.CategoryDelete.as_view(), name='category-delete'),
     #     # Anything else
     #     re_path(r'^.*$', views.CategoryDetail.as_view(), name='category-detail'),
+        path('api/machinecategory/?id=<int:id>', MachineCategoryList.as_view(), name='machine-category-list'),
         path('api/machinecategory/', MachineCategoryList.as_view(), name='machine-category-list'),
-        path('api/machinecategory/<int:id>', MachineCategoryList.as_view(), name='machine-category-list'),
         path('data/', MachineCategoryData.as_view(), name="machine-category-data"), 
         # path('data/<int:pk>/', MachineCategoryData.as_view(), name="machine-subcategory-data"), 
         path('', Category.as_view(), name="machine-category"),
+        path('<int:id>', Category.as_view(), name="machine-category"),
     ]
 
 api_urls = [
