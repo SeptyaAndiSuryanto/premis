@@ -1,21 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path, include
-from . import views
-from .views import Category, MachineCategoryData, MachineCategoryList
+from . import views, api
+from .views import MachineCategoryView, MachineCategoryList, MachineCategoryCreateAPIView
+# MachineCategoryData
 
 
 category_urls = [
-    # re_path(r'(?P<pk>\d+)/', views.CategoryDetail.as_view(), name='category-detail')
-    # re_path(r'(?P<pk>\d+)/', include([
-    #     # re_path(r'^delete/', views.CategoryDelete.as_view(), name='category-delete'),
-    #     # Anything else
-    #     re_path(r'^.*$', views.CategoryDetail.as_view(), name='category-detail'),
-        path('api/machinecategory/?id=<int:id>', MachineCategoryList.as_view(), name='machine-category-list'),
-        path('api/machinecategory/', MachineCategoryList.as_view(), name='machine-category-list'),
-        path('data/', MachineCategoryData.as_view(), name="machine-category-data"), 
-        # path('data/<int:pk>/', MachineCategoryData.as_view(), name="machine-subcategory-data"), 
-        path('', Category.as_view(), name="machine-category"),
-        path('<int:id>', Category.as_view(), name="machine-category"),
+    path('api/machinecategory/list', api.MachineCategoryListApi.as_view(), name='machine-category-list-all'),
+    path('api/machinecategory/', api.MachineCategoryApi.as_view(), name='machine-category-list'),
+    path('api/machinecategory/?id=<int:id>', api.MachineCategoryApi.as_view(), name='machine-category-list'),
+    path('api/machinecategory/create', api.MachineCategoryCreateApi.as_view(), name='machine-category-create'),
+    path('api/machinecategory/<int:pk>/update/', api.MachineCategoryUpdateApi.as_view(), name='machine-category-update'),
+    path('api/machinecategory/<int:pk>/delete', api.MachineCategoryDeleteApi.as_view(), name='machine-category-delete'),
+
+    path('', MachineCategoryView.as_view(), name="machine-category"),
+    path('<int:id>', MachineCategoryView.as_view(), name="machine-category"),
     ]
 
 api_urls = [
