@@ -1,10 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View, CreateView
+from django.shortcuts import render
+from django.urls import reverse_lazy
+
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.views import APIView
 
+from .forms import MachineCategoryForm
 from .models import MachineCategory, Machine
 from .serializers import MachineCategorySerializer
 
@@ -72,13 +77,43 @@ class MachineCategoryView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class MachineCategoryCreateAPIView(APIView):
-    def post(self, request, format=None):
-        serializer = MachineCategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+class MachineCategoryCreateAPIView(generics.CreateAPIView):
+    queryset = MachineCategory.objects.all()
+    serializer_class = MachineCategorySerializer
+    # template_name = 'category_create_modal.html'
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if request.is_ajax():
+            if response.status_code == 201:
+                return render(request, 'yourmodel_create_success.html')
+            else:
+                return render(request, 'machine-category-create.html', {'form': self.get_serializer().data}, status=400)
+        # serializer = MachineCategorySerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data)
+        # return Response(serializer.errors, status=400)
+    
+
+class MachineCategoryCreateView(CreateView):
+    model = MachineCategory
+    form_class = MachineCategoryForm
+    template_name = "category_create_modal.html"
+    success_url = reverse_lazy('machine-category')
+
+    # def get(self, request, *args, **kwargs):
+    #     form = self.form_class()
+    #     return render(request, self.template_name, {'form': form})
+
+    # def post(self, request, *args, **kwargs):
+    #     form = self.form_class(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         return render(request, 'category_create_success.html')
+    #     else:
+    #         return render(request, self.template_name, {'form':form}, status=400)
+
 '''
 # class CategoryDetail(DetailView):
 #     """Detail view for PartCategory."""

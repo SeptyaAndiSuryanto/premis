@@ -117,35 +117,7 @@
 {% endblock %}
 
 {% block modal %}
-<div class="modal fade" id="modal-new-category">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Create Machine Category</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-            <form id="myForm">
-                {% csrf_token %}
-                {% for field in form %}
-                  <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
-                  </div>
-                {% endfor %}
-              </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-      <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-  </div>
+<div class="modal fade" id="modal-new-category"></div>
 {% endblock %}
 
 {% block extra_javascript %}
@@ -210,7 +182,17 @@
         }
         else{
             populateTable();
-        }
+        };
+
+        $('#modal-new-category').on('show.bs.modal', function (event) {
+            var modal = $(this);
+            $.ajax({
+              url: "{% url 'machine-category-create' %}",
+              context: document.body
+            }).done(function(response) {
+              modal.html(response);
+            });
+        });
     });
 </script>
 {% endblock %}
