@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, View, CreateView
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, resolve
 
 from django_filters import rest_framework as filters
 from rest_framework import generics
@@ -102,6 +102,27 @@ class MachineCategoryCreateView(CreateView):
     template_name = "category_create_modal.html"
     success_url = reverse_lazy('machine-category')
 
+    def get_default_parent(request):
+        # Get the id from the request URL
+        id = resolve(request.path_info).kwargs.get('id')
+        print(id)
+
+        # Use the id to get the parent object
+        parent = MachineCategory.objects.filter(id=id).first()
+
+        # Return the parent object or default to root node if it doesn't exist
+        return parent
+
+    def form_valid(self, form):
+        # Get the parent object using the request object
+        parent = self.get_default_parent(self.request)
+        print(parent)
+        print("parent")
+        # Set the parent field of the PremisTree instance
+        form.instance.parent = parent
+
+        # Call the parent class's form_valid() method to save the form
+        return super().form_valid(form)
     # def get(self, request, *args, **kwargs):
     #     form = self.form_class()
     #     return render(request, self.template_name, {'form': form})

@@ -23,6 +23,9 @@ class MachineCategory(PremisTree):
         name: Name of this category
         parent: Parent category
     """
+    
+    
+    
     def delete(self, *args, **kwargs):
         """Custom model deletion routine, which updates any child categories or parts.
 
@@ -54,7 +57,7 @@ class MachineCategory(PremisTree):
     def get_absolute_url(self):
         """Return the web URL associated with the detail view for this MachineCategory instance"""
         return reverse('category-detail', kwargs={'pk': self.id})
-
+    
     class Meta:
         verbose_name = _("Machine Category")
         verbose_name_plural = _("Machine Categories")

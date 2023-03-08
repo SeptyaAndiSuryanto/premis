@@ -8,7 +8,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
+from django.urls import reverse, resolve
 
 
 from error_report.models import Error
@@ -57,6 +57,8 @@ class PremisTree(MPTTModel):
         if pathstring != self.pathstring:
             self.pathstring = pathstring
             super().save(force_update=True)
+
+    
 
     class Meta:
         """Metaclass defines extra model properties."""
