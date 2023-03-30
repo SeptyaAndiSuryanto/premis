@@ -23,6 +23,12 @@ class MachineCategoryFilter(filters.FilterSet):
         fields = '__all__'
 
 
+class MachineFilter(filters.FilterSet):
+    class Meta:
+        model = Machine
+        fields = '__all__'
+
+
 class MachineCategoryList(generics.ListAPIView):
     queryset = MachineCategory.objects.all()
     serializer_class = MachineCategorySerializer
@@ -134,6 +140,33 @@ class MachineCategoryCreateView(CreateView):
     #         return render(request, 'category_create_success.html')
     #     else:
     #         return render(request, self.template_name, {'form':form}, status=400)
+
+
+class MachineView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+    template_name = "machine.html"
+
+    def get_context_data(self, **kwargs):
+        """Returns custom context data for the PartIndex view:
+
+        - children: Number of child categories
+        - category_count: Number of child categories
+        - machine_count: Number of machine contained
+        """
+        context = super().get_context_data(**kwargs).copy()
+
+        if 'id' in self.request.GET:
+            id = self.request.GET['id']
+            machine = Machine.objects.get(id=id)
+            context['breadcrumbs'] = machine.category.pathstring
+            context['desc'] = machine.description
+            context['name'] = machine.name
+            context['IPN'] = machine.IPN
+            context['category'] = machine.category.name
+        
+        return context
+    
 
 '''
 # class CategoryDetail(DetailView):

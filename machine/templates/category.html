@@ -3,8 +3,6 @@
 {% load mptt_tags %}
 
 
-
-
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 {% endblock  %}
@@ -72,7 +70,7 @@
         </div>
     </div>
 
-    <div class="card card-default color-palette-box">
+    <div class="card card-default color-palette-box" id="subcategories-div" style="display: revert">
         <div class="card-header">
             <h3 class="card-title"><i class="fa-solid fa-network-wired"></i>&nbsp;</i>Subcategories</h3>
             <div class="card-tools">
@@ -114,6 +112,49 @@
             </div>
         </div>
     </div>
+    
+    <div class="card card-default color-palette-box" id="machines-div" style="display: none">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fa-brands fa-houzz">&nbsp;</i>Machines</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#modal-new-machine"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;New Machine</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="">
+                        <div class="card-body p-0">
+                            <div class='panel panel-hidden' id='panel-subcategories'>
+                                {% comment %} <div class='panel-heading'>
+                                    <h4>{% trans "Subcategories" %}</h4>
+                                </div> {% endcomment %}
+                                <div class='panel-content'>
+                                    
+                                    {% comment %} <div id='subcategory-button-toolbar'>
+                                        <div class='btn-group' role='group'>
+                                            {% include "filter_list.html" with id="category" %}
+                                        </div>
+                                    </div> {% endcomment %}                        
+                                </div>
+                            </div>
+                            <table id="machine-table" class="table table-sm table-bordered table-hover" style="width:100%">
+                                <thead>
+                                <tr>
+                                <th style="width:20%">Machine</th>
+                                <th style="width:30%">IPN</th>
+                                <th style="width:50%">Description</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block modal %}
@@ -122,11 +163,12 @@
 
 {% block extra_javascript %}
 <script language="javascript">
-    function populateTable() {
+    function populateCategoriesTable() {
         $.ajax({
             url: '{% url 'machine-category-list' %}',
             dataType: 'json',
             success: function(data) {
+                $('#subcategories-table tbody').empty();
                 $.each(data.data, function(index, item) {
                     var row = '<tr>' +
                         '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
@@ -139,19 +181,52 @@
           });
     }
 
-    function populateTableWithParam(id) {
+    function populateCategoriesTableWithParam(id) {
         $.ajax({
             url: '{% url 'machine-category-list' %}' + '?id=' + id,
             dataType: 'json',
             success: function(data) {
-                $.each(data.data, function(index, item) {
+                $('#subcategories-table tbody').empty();
+                if(data.recordsFiltered == 0){
                     var row = '<tr>' +
-                        '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
-                        '<td>' + item.description + '</td>' +
-                        '<td>' + item.pathstring + '</td>' +
+                        '<td class="text-center" colspan="3">No data</td>' +
                         '</tr>';
                     $('#subcategories-table tbody').append(row);
-                });
+                } else {
+                    $.each(data.data, function(index, item) {
+                        var row = '<tr>' +
+                            '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
+                            '<td>' + item.description + '</td>' +
+                            '<td>' + item.pathstring + '</td>' +
+                            '</tr>';
+                        $('#subcategories-table tbody').append(row);
+                    });
+                }
+            }
+          });
+    }
+
+    function populateMachinesTableWithParam(id) {
+        $.ajax({
+            url: '{% url 'machine-list' %}' + '?id=' + id,
+            dataType: 'json',
+            success: function(data) {
+                $('#machine-table tbody').empty();
+                if(data.recordsFiltered == 0){
+                    var row = '<tr>' +
+                        '<td class="text-center" colspan="3" >No data</td>' +
+                        '</tr>';
+                    $('#machine-table tbody').append(row);
+                } else {
+                    $.each(data.data, function(index, item) {
+                        var row = '<tr>' +
+                            '<td><a href="{% url 'machine' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
+                            '<td>' + item.IPN + '</td>' +
+                            '<td>' + item.description + '</td>' +
+                            '</tr>';
+                        $('#machine-table tbody').append(row);
+                    });
+                }
             }
           });
     }
@@ -174,14 +249,32 @@
         });
     }
 
+    $('#showMachine').on('click', function(e){
+        $("#machines-div").toggle().show();
+        $("#subcategories-div").toggle().hide();
+
+    });
+
+    $('#showCategories').on('click', function(e){
+        $("#subcategories-div").toggle().show();
+        $("#machines-div").toggle().hide();
+    });
+
     $(document).ready(function() {
+        $("#navMenus").on('click', 'a', function () {
+            $("#navMenus a.active").removeClass("active");
+            // adding classname 'active' to current click li 
+            $(this).addClass("active");
+        });
+
         var url = new URL(window.location.href);
         var param = url.searchParams.get("id");
         if (param!=null){
-            populateTableWithParam(param);
+            populateCategoriesTableWithParam(param);
+            populateMachinesTableWithParam(param);
         }
         else{
-            populateTable();
+            populateCategoriesTable();
         };
 
         $('#modal-new-category').on('show.bs.modal', function (event) {

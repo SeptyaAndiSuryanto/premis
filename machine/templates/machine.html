@@ -7,17 +7,18 @@
 {% endblock  %}
 
 {% block breadcrumbs %}
-    <li class="breadcrumb-item active">Machine</li>
+    <li class="breadcrumb-item">Machine</li>
+    <li class="breadcrumb-item active">{{ breadcrumbs }}</li>
 {% endblock %}
 
 {% block sidebar %}
-    {% include 'category_sidebar.html' %}
+    {% include 'machine_sidebar.html' %}
 {% endblock sidebar %}
 
 {% block body %}
 <div class="card card-default color-palette-box">
     <div class="card-header">
-        <h3 class="card-title"><i class="fa-solid fa-cubes-stacked"></i>&nbsp;</i>Machine Category</h3>
+        <h3 class="card-title"><i class="fa-solid fa-gears"></i>&nbsp;</i>{{ name }}</h3>
         <div class="card-tools">
             <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
             </button>
@@ -25,46 +26,39 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-6">
+            <div class="col-4">
                 <div class="card">
                     <div class="card-body p-0">
-                    <table class="table table-sm">
-                        <tbody>
-                        <tr>
-                            <td width="10%"><i class="fa-solid fa-circle-info"></i></td>
-                            <td width="30%">Description</td>
-                            <td>
-                                {% if "/machine/category/" == request.path %}<cite title="Source Title">Top level machine category</cite>{% endif %}
-                                {% if category %}
-                                    {% if category.description %}
-                                        {{ category.description }}
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="10%"><i class="fa-solid fa-network-wired"></td>
-                            <td width="30%">Category Path</td>
-                            <td>/</td>
-                        </tbody>
-                    </table>
+
                     </div>
                 </div>
             </div>
-            <div class="col-6">
+
+            <div class="col-8">
                 <div class="card">
                     <div class="card-body p-0">
                     <table class="table table-sm">
                         <tbody>
-                        <tr>
-                            <td width="10%"><i class="fa-solid fa-network-wired"></i></td>
-                            <td width="70%">Subcategories</td>
-                            <td>{{ children.count }}</td>
+                        <tr class="text-left">
+                            <td width="5%"><i class="fa-solid fa-font"></i></td>
+                            <td width="20%">Name</td>
+                            <td width="70%">{{ name }}</td>
                         </tr>
-                        <tr>
-                            <td width="10%"><i class="fa-brands fa-houzz"></td>
-                            <td width="70%">Machine (Including subcategories)</td>
-                            <td>{{ machine_count }}</td>
+                        <tr class="text-left">
+                            <td width="5%"><i class="fa-solid fa-tag"></i></td>
+                            <td width="20%">IPN</td>
+                            <td width="70%">{{ IPN }}</td>
+                        </tr>
+                        <tr class="text-left">
+                            <td width="5%"><i class="fa-solid fa-circle-info"></i></td>
+                            <td width="20%">Description</td>
+                            <td width="70%">{{ desc }}</td>
+                        </tr>
+                        <tr class="text-left">
+                            <td width="5%"><i class="fa-solid fa-network-wired"></td>
+                            <td width="20%">Line Machine</td>
+                            <td width="70%">{{ category }}</td>
+                        </tr>
                         </tbody>
                     </table>
                     </div>
@@ -74,9 +68,9 @@
     </div>
 </div>
 
-<div class="card card-default color-palette-box">
+<div class="card card-default color-palette-box" id="records-div" style="display: revert">
     <div class="card-header">
-        <h3 class="card-title"><i class="fa-solid fa-network-wired"></i>&nbsp;</i>Subcategories</h3>
+        <h3 class="card-title"><i class="fa-solid fa-clipboard"></i></i>&nbsp;</i>Preventive Record</h3>
     </div>
     <div class="card-body">
         <div class="row">
@@ -100,25 +94,142 @@
         </div>
     </div>
 </div>
+
+<div class="card card-default color-palette-box" id="itemRelated-div" style="display: none">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fa-brands fa-stack-overflow"></i>&nbsp;</i>Preventive Item Related</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="">
+                    <div class="card-body p-0">
+                        <table id="task-related-table" class="table table-bordered table-hover" style="width:100%">
+                            <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Description</th>
+                              <th>Path</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_javascript %}
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script language="javascript">
-        $(document).ready(function () {
-            $('#subcategories-table').dataTable({
-                serverSide: true,
-                search: {
-                    return: true,
-                },
-                ajax: {
-                    url: '{% url "dynamic_mptt_datatable_view" %}',
-                    type: 'GET',
-                    data: function(d) {
-                      d.parent_id = $('#parent-id').val();
-                    }
-                  },
+<script language="javascript">
+    function populatePreventiveRecord(id) {
+        $.ajax({
+            url: '{% url 'machine-category-list' %}' + '?id=' + id,
+            dataType: 'json',
+            success: function(data) {
+                $('#subcategories-table tbody').empty();
+                if(data.recordsFiltered == 0){
+                    var row = '<tr>' +
+                        '<td class="text-center" colspan="3">No data</td>' +
+                        '</tr>';
+                    $('#subcategories-table tbody').append(row);
+                } else {
+                    $.each(data.data, function(index, item) {
+                        var row = '<tr>' +
+                            '<td><a href="{% url 'machine-category' %}' + '?id=' + item.id + '">' + item.name + '</a></td>' +
+                            '<td>' + item.description + '</td>' +
+                            '<td>' + item.pathstring + '</td>' +
+                            '</tr>';
+                        $('#subcategories-table tbody').append(row);
+                    });
+                }
+            }
+          });
+    }
+
+    function populateItemRelatedTable(id) {
+        $.ajax({
+            url: '{% url 'task-related' %}' + '?id=' + id,
+            dataType: 'json',
+            success: function(data) {
+                $('#task-related-table tbody').empty();
+                if(data.recordsFiltered == 0){
+                    var row = '<tr>' +
+                        '<td class="text-center" colspan="3" >No data</td>' +
+                        '</tr>';
+                    $('#machine-table tbody').append(row);
+                } else {
+                    $.each(data.data, function(index, item) {
+                        var row = '<tr>' +
+                            '<td><a href="{% url 'machine' %}' + '?id=' + item.id + '">' + item.machine_name + '</a></td>' +
+                            '<td>' + item.item_name + '</td>' +
+                            '<td>' + item.username + '</td>' +
+                            '</tr>';
+                        $('#task-related-table tbody').append(row);
+                    });
+                }
+            }
+          });
+    }
+
+    function submitForm() {
+        var formData = new FormData(document.getElementById("myForm"));
+        $.ajax({
+            url: "{% url 'machine-category-create' %}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                alert("Object created successfully");
+                $('#myModal').modal('hide');
+            },
+            error: function(xhr, status, error) {
+                alert(xhr.responseText);
+            }
+        });
+    }
+
+    $('#showRecords').on('click', function(e){
+        $("#records-div").toggle().show();
+        $("#itemRelated-div").toggle().hide();
+
+    });
+
+    $('#showItemRelated').on('click', function(e){
+        $("#itemRelated-div").toggle().show();
+        $("#records-div").toggle().hide();
+    });
+
+    $(document).ready(function() {
+        $("#navMenus").on('click', 'a', function () {
+            $("#navMenus a.active").removeClass("active");
+            // adding classname 'active' to current click li 
+            $(this).addClass("active");
+        });
+
+        var url = new URL(window.location.href);
+        var param = url.searchParams.get("id");
+        if (param!=null){
+            populatePreventiveRecord(param);
+            populateItemRelatedTable(param);
+        }
+        else{
+            console.log("ekl");
+        };
+
+        $('#modal-new-category').on('show.bs.modal', function (event) {
+            var modal = $(this);
+            $.ajax({
+              url: "{% url 'machine-category-create' %}",
+              context: document.body
+            }).done(function(response) {
+              modal.html(response);
             });
         });
-    </script>
+    });
+</script>
 {% endblock %}
