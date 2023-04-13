@@ -6,6 +6,7 @@ from django.conf.urls import include
 from premis.views import IndexView
 from users.views import PremisLoginView, PremisLogout
 from machine.urls import machinepatterns as machine_urls
+from task.urls import taskpatterns as task_urls
 
 
 authurls = [
@@ -16,6 +17,7 @@ authurls = [
 fronturls = [
     path('', login_required(IndexView.as_view(), login_url='login'), name="index"),
     re_path(r'^machine/', include(machine_urls)),
+    re_path(r'^task/', include(task_urls)),
 ]
 
 backurls = []

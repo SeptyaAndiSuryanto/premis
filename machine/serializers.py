@@ -7,6 +7,7 @@ class MachineCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MachineSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Machine
         fields = '__all__'

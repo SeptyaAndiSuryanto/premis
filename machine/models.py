@@ -158,4 +158,9 @@ class Machine(models.Model):
     def __str__(self):
         """Get string representation of a Period."""
         return "{n} - {d}".format(n=self.category.name, d=self.name)
+    
+    def get_absolute_url(self):
+        return reverse("machine-args", kwargs={"id": self.pk})
+        # return reverse("machine:machine", kwargs={"id": self.pk})
+    
 

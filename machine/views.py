@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
-from .forms import MachineCategoryForm
+from .forms import MachineCategoryForm, MachineCreateForm
 from .models import MachineCategory, Machine
 from .serializers import MachineCategorySerializer
 
@@ -167,7 +167,34 @@ class MachineView(LoginRequiredMixin, TemplateView):
         
         return context
     
+class MachineCreateView(CreateView):
+    model = Machine
+    form_class = MachineCreateForm
+    template_name = "machine_create_modal.html"
+    # success_url = reverse_lazy('machine-category')
 
+    def get_success_url(self, **kwargs):
+        return self.object.get_absolute_url()
+
+    # def get_default_subcategory(request):
+    #     # Get the id from the request URL
+    #     id = resolve(request.path_info).kwargs.get('id')
+    #     print(id)
+
+    #     # Use the id to get the parent object
+    #     subcategory = MachineCategory.objects.filter(id=id).first()
+
+    #     # Return the parent object or default to root node if it doesn't exist
+    #     return subcategory
+
+    # def form_valid(self, form):
+    #     # Get the parent object using the request object
+    #     category = self.get_default_subcategory(self.request)
+    #     # Set the parent field of the PremisTree instance
+    #     form.instance.category = category
+
+    #     # Call the parent class's form_valid() method to save the form
+    #     return super().form_valid(form)
 '''
 # class CategoryDetail(DetailView):
 #     """Detail view for PartCategory."""

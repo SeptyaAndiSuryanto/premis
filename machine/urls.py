@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path, include
 from . import views, api
-from .views import MachineCategoryView, MachineCategoryList, MachineCategoryCreateAPIView, MachineCategoryCreateView, MachineView
+from .views import MachineCategoryView, MachineCategoryList, MachineCategoryCreateAPIView, MachineCategoryCreateView, MachineView, MachineCreateView
 # MachineCategoryData
 
 
@@ -12,7 +12,9 @@ category_urls = [
 ]
 
 machine_urls = [
+    path('?id=<int:id>', MachineView.as_view(), name="machine-args"),
     path('', MachineView.as_view(), name="machine"),
+    path('create/', MachineCreateView.as_view(), name='machine-create'),
 
 ]
 

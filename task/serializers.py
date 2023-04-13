@@ -1,20 +1,29 @@
 from rest_framework import serializers
-from .models import Task, CheckItem
-from machine.models import Machine
-from machine import serializers as machine_serializers
+from .models import Task, CheckItem, Period
+
 
 
 class CheckItemSerializer(serializers.ModelSerializer):
-
+    period = serializers.CharField(source='period.name', read_only=True)
     class Meta:
         model = CheckItem
         fields = '__all__'
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    machine_name = machine_serializers.MachineSerializer(source='machine.name', read_only=True)
-    item_name = CheckItemSerializer(source='item.name', read_only=True)
-
+    machine = serializers.CharField(source='machine.name', read_only=True)
+    item = serializers.CharField(source='item.name', read_only=True)
+    period = serializers.CharField(source='item.period', read_only=True)
+    creation_user = serializers.CharField(source='creation_user.username', read_only=True)
+    
     class Meta:
         model = Task
-        fields = ('id','machine_name','item_name')
+        fields = '__all__'
+        # fields = ('id','machine','item','description','creation_date','creation_user')
+
+
+class PeriodSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Period
+        fields = '__all__'

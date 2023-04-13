@@ -125,3 +125,22 @@ class Task(models.Model):
     def get_absolute_url(self):
         """Get the web URL for the detail view for this task."""
         return reverse('task-detail', kwargs={'pk': self.id})
+
+
+class Record(models.Model):
+
+    task = models.ForeignKey(Task, verbose_name=_("Task"), related_name=_("taskrecord"), on_delete=models.CASCADE)
+    remarks = models.TextField(_("Remarks"))
+    creation_date = models.DateField(auto_now_add=True, editable=False, blank=True, null=True, verbose_name=_('Submitted on'), )
+    creation_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_('Submitted by'), related_name='record_created')
+
+
+    class Meta:
+        verbose_name = _("record")
+        verbose_name_plural = _("records")
+
+    def __str__(self):
+        return f"{self.task}"
+
+    def get_absolute_url(self):
+        return reverse("record_detail", kwargs={"pk": self.pk})

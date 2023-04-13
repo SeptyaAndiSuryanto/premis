@@ -27,6 +27,7 @@ class PeriodAdmin(ImportExportModelAdmin):
         'value_in_day',
     ]
 
+
 class CheckItemResource(PremisResource):
     
     class Meta:
@@ -74,6 +75,31 @@ class TaskAdmin(ImportExportModelAdmin):
     ]
 
 
+class RecordResource(PremisResource):
+    
+    class Meta:
+        """Metaclass defines extra options"""
+        model = models.Record
+        skip_unchanged = True
+        report_skipped = False
+        clean_model_instances = True
+
+
+class RecordAdmin(ImportExportModelAdmin):
+    """Admin class for the Company model"""
+
+    resource_class = RecordResource
+
+    list_display = ('id','task', 'remarks', 'creation_date','creation_user')
+
+    search_fields = [
+        'task',
+        'remarks',
+        'creation_date',
+    ]
+
+
 admin.site.register(models.Period, PeriodAdmin)
 admin.site.register(models.CheckItem, CheckItemAdmin)
 admin.site.register(models.Task, TaskAdmin)
+admin.site.register(models.Record, RecordAdmin)

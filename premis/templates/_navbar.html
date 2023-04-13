@@ -16,9 +16,12 @@
 
     {% if perms.machine %}
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="index3.html" class="nav-link {% if "/task/" in request.path %}active{% endif %}"><i class="fa-solid fa-list-check"></i>&nbsp;Task</a>
+            <a href="{% url 'task' %}" class="nav-link {% if "/task/" in request.path %}active{% endif %}"><i class="fa-solid fa-list-check"></i>&nbsp;Task</a>
         </li>
     {% endif %}
+    <li class="nav-item d-none d-sm-inline-block">
+        <a href="{% url 'machine-category' %}" class="nav-link" target="_blank"><span class="right badge badge-danger"><i class="fas fa-tv"></i>&nbsp;Live Task</span></a>
+    </li>
 </ul>
 
 <!-- Right navbar links -->
